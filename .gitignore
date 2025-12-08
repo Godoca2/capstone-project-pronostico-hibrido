@@ -1,0 +1,222 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py.cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+# .python-version
+
+# pipenv
+#Pipfile.lock
+
+# UV
+#uv.lock
+
+# poetry
+#poetry.lock
+#poetry.toml
+
+# pdm
+#pdm.lock
+#pdm.toml
+.pdm-python
+.pdm-build/
+
+# pixi
+#pixi.lock
+.pixi
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.envrc
+.venv
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# PyCharm
+#.idea/
+
+# Data files (project specific)
+*.npy
+*.csv
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+*.nc
+
+# Large data files
+data/external/**/*.nc
+data/raw/**/*.nc
+data/processed/**/*.nc
+
+# Generated figures (reproducible from notebooks)
+reports/figures/*.png
+reports/figures/*.jpg
+reports/figures/*.pdf
+
+# Model weights and artifacts
+data/models/*.h5
+data/models/*.pkl
+data/models/**/*.h5
+data/models/**/*.pkl
+*.weights.h5
+
+# MLflow
+mlruns/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Abstra
+.abstra/
+
+# Ruff
+.ruff_cache/
+
+# PyPI
+.pypirc
+
+# Cursor
+.cursorignore
+.cursorindexingignore
+
+# Marimo
+marimo/_static/
+marimo/_lsp/
+__marimo__/
+
+# Documentos temporales de auditoría y validación interna
+AUDITORIA_*.md
+COMPLETADO_*.md
+CORRECCIONES_*.md
+DIAGNOSTICO_*.md
+GUIA_VALIDACION.md
+PROGRESO_*.md
+RESUMEN_CORRECCIONES_*.md
+RESUMEN_EJECUTIVO_*.md
+RESUMEN_MEJORAS.md
+VALIDACION_*.md

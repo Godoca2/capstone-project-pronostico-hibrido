@@ -1,0 +1,48 @@
+name: capstone_env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  # === Núcleo científico ===
+  - numpy
+  - pandas
+  - scipy
+  - scikit-learn
+  - matplotlib
+  - seaborn
+  - jupyterlab
+  - ipykernel
+
+  # === Datos climáticos y geoespaciales ===
+  - xarray
+  - netcdf4
+  - cftime
+  - h5py
+  - gdal
+  - proj
+  - geos
+  - rasterio
+  - rioxarray
+  - pykrige
+  - scikit-gstat
+
+  # === Machine Learning y Deep Learning ===
+  - tensorflow=2.15.0
+  - pydmd
+  - mlflow
+
+  # === Utilidades y compatibilidad ===
+  - tqdm
+  - requests
+  - joblib
+  - pyyaml
+  - python-dotenv
+
+  # === Instalaciones via pip ===
+  - pip:
+      - keras
+      - netCDF4
+      - cartopy
+      - geopandas
+
