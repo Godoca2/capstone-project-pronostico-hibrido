@@ -9,7 +9,7 @@
 ## 📦 Contenido del Entregable
 
 ### 1. **Repositorio GitHub** (código y notebooks)
-**URL:** https://github.com/Godoca2/Pronostico-Hibrido-Espacio-Temporal-de-Precipitaciones-en-Chile
+**URL:** https://github.com/Godoca2/capstone-project-pronostico-hibrido
 
 **Contenido disponible en GitHub:**
 - ✅ 8 notebooks mejorados con SEED=42 (reproducibilidad)
