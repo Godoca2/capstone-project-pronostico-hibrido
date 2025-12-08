@@ -98,9 +98,8 @@ CAPSTONE_PROJECT/
 │ ├── encoder_geostat.h5 # Solo encoder
 │ └── training_metrics.csv # Historial entrenamiento
 │
-├── notebooks/
-│ ├── 01_EDA.ipynb # [OK] EDA básico
-│ ├── 01A_Eda_spatiotemporal.ipynb # [OK] EDA espacial-temporal (macrozonas)
+├── notebooks
+│ ├── 01_Eda_Spatiotemporal.ipynb # [OK] EDA espacial-temporal (macrozonas)
 │ ├── 02_DL_DMD_Forecast.ipynb # Ejemplo Prof. Herrera (didáctico)
 │ ├── 02_Geoestadistica_Variogramas_Kriging.ipynb # [OK] Variogramas y kriging
 │ ├── 03_AE_DMD_Training.ipynb # [OK] Entrenamiento AE+DMD baseline
@@ -415,7 +414,7 @@ Ver `ROADMAP.md` para tareas pendientes:
 
 ### Contacto y Soporte
 
-- **Repositorio**: https://github.com/Godoca2/Pronostico-Hibrido-Espacio-Temporal-de-Precipitaciones-en-Chile
+- **Repositorio**: https://github.com/Godoca2/capstone-project-pronostico-hibrido
 - **Issues**: GitHub Issues para reportar problemas
 - **Documentación**: Ver `ROADMAP.md` para hoja de ruta detallada
 

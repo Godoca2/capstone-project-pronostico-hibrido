@@ -551,8 +551,7 @@ CAPSTONE_PROJECT/
 │ ├── processed/ # Datos normalizados, pickle results
 │ └── models/ # Pesos entrenados (.h5)
 ├── notebooks/
-│ ├── 01_EDA.ipynb # Análisis exploratorio Chile
-│ ├── 01A_Eda_spatiotemporal.ipynb # Patrones espaciotemporales
+│ ├── 01_Eda_spatiotemporal.ipynb # Patrones espaciotemporales
 │ ├── 02_DL_DMD_Forecast.ipynb # Ejemplo Prof. Herrera (didáctico)
 │ ├── 02_Geoestadistica_Variogramas_Kriging.ipynb # [OK] Variogramas implementados
 │ ├── 03_AE_DMD_Training.ipynb # [OK] Modelo AE+DMD baseline
@@ -818,7 +817,7 @@ Tecnológico: propone un modelo de bajo costo computacional y alta capacidad de 
  - Comparación con estado del arte
 
 8. **Preparación presentación**
- - Slides con resultados clave
+ - Slides con resultados
  - Demos en vivo (notebooks interactivos)
  - Video explicativo (5-7 min)
 
@@ -904,31 +903,3 @@ Considero que el proyecto ha avanzado excepcionalmente:
 | Interpretabilidad | DMD físico | [OK] 23 modos | Análisis energético por macrozona |
 | Visualizaciones | ≥20 | 35+ [OK] | Figuras científicas high-quality |
 
-**Nivel Alcanzado: Distinción con Mención (85-95%)**
-
-### **Justificación Evaluación**
-
-El proyecto ha **superado ampliamente** los objetivos del Hito 2:
-
-1. **Fundamentos técnicos sólidos**: Pipeline completo operativo, GPU productiva
-2. **Resultados competitivos**: MAE 1.691 mm/día comparable a GraphCast (1.45) con 1000x menos recursos
-3. **Contribución novel**: KoVAE para precipitaciones Chile es **primera implementación** en la literatura
-4. **Optimización exhaustiva**: 13 configuraciones evaluadas sistemáticamente
-5. **Interpretabilidad física**: Modos DMD decodificados con análisis regional
-6. **Documentación ejemplar**: 4 archivos MD actualizados, 244 celdas ejecutadas
-7. **Reproducibilidad garantizada**: Código modular, modelos guardados, conda environment
-
-El proyecto está **en excelente posición** para alcanzar **excelencia (90-100%)** tras completar:
-- Validación satelital CHIRPS (Fase 4, ~4 horas trabajo)
-- Paper científico draft (Fase 5, ~15 horas)
-- Presentación defensa (Fase 5, ~6 horas)
-
-**Conclusión**: El proyecto es **altamente factible**, metodológicamente **riguroso**, con resultados **publicables** y alineado con mis objetivos profesionales en recursos hídricos y modelamiento climático.
-
------------
-
-## **10. Coevaluación**
-
-Como autor único, se reconoce la orientación y retroalimentación del profesor guía Dr. Mauricio Herrera Marín, quien ha proporcionado lineamientos metodológicos y bibliografía clave.
-
--------

@@ -1,4 +1,4 @@
-# 📚 GLOSARIO TÉCNICO Y CIENTÍFICO
+# GLOSARIO TÉCNICO Y CIENTÍFICO
 ## Proyecto: Pronóstico Híbrido Espacio-Temporal de Precipitaciones en Chile
 
 **Versión:** 1.0  
@@ -7,7 +7,7 @@
 
 ---
 
-## 🔤 ÍNDICE ALFABÉTICO
+## ÍNDICE ALFABÉTICO
 
 [A](#a) | [B](#b) | [C](#c) | [D](#d) | [E](#e) | [F](#f) | [G](#g) | [H](#h) | [I](#i) | [K](#k) | [L](#l) | [M](#m) | [N](#n) | [O](#o) | [P](#p) | [R](#r) | [S](#s) | [T](#t) | [U](#u) | [V](#v) | [W](#w)
 
@@ -753,7 +753,7 @@ Tamaño de la ventana temporal de observaciones pasadas usadas para predicción.
 
 ---
 
-## 📊 SIGLAS Y ACRÓNIMOS
+## SIGLAS Y ACRÓNIMOS
 
 | Sigla | Significado | Contexto |
 |-------|-------------|----------|
@@ -955,7 +955,7 @@ x(t+h) = Aʰ x(t)
 
 ---
 
-## 📝 NOTAS DE USO
+## NOTAS DE USO
 
 ### Convenciones en el Glosario
 
@@ -980,7 +980,7 @@ x(t+h) = Aʰ x(t)
 
 ---
 
-## 🔄 CONTROL DE VERSIONES
+## CONTROL DE VERSIONES
 
 | Versión | Fecha | Cambios |
 |---------|-------|---------|
@@ -991,7 +991,7 @@ x(t+h) = Aʰ x(t)
 **Autor:** César Godoy Delaigue  
 **Proyecto:** Pronóstico Híbrido Espacio-Temporal de Precipitaciones en Chile  
 **Institución:** Universidad del Desarrollo (UDD)  
-**Contacto:** [tu_email@udd.cl]
+**Contacto:** [c.godoyd@udd.cl]
 
 ---
 
