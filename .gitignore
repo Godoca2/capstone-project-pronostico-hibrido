@@ -166,9 +166,9 @@ data/raw/**/*.nc
 data/processed/**/*.nc
 
 # Generated figures (reproducible from notebooks)
-reports/figures/*.png
-reports/figures/*.jpg
-reports/figures/*.pdf
+# reports/figures/*.png
+# reports/figures/*.jpg
+# reports/figures/*.pdf
 
 # Model weights and artifacts
 data/models/*.h5
