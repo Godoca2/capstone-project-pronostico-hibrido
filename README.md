@@ -360,7 +360,7 @@ El notebook `03_AE_DMD_Training.ipynb` ejecuta el pipeline completo:
 - Notebook preparado para: comparación ERA5 vs CHIRPS, validación cruzada predicciones, análisis de bias
 - [AVISO] **Pendiente**: Descarga datos (~2-4 GB) y ejecución de validación
 
-### Próximos Pasos (Opcionales)
+### Próximos Pasos
 
 Ver `ROADMAP.md` para tareas pendientes:
 
@@ -380,7 +380,7 @@ Ver `ROADMAP.md` para tareas pendientes:
 
 **Última actualización**: 19 noviembre 2025 
 **Responsable**: César Godoy Delaigue 
-**Fase actual**: Fase 3 - Optimización Avanzada (**Completada 100%**) → Iniciando Fase 4 
+**Fase actual**: Fase 3 - Optimización  (**Completada 100%**) → Iniciando Fase 4 
 **Notebooks ejecutados**: 7/8 principales (87.5%), todos funcionales 
 **Progreso global**: **65%** (3/5 fases completas)
 
