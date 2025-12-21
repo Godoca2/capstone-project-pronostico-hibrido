@@ -392,6 +392,28 @@ Ver `ROADMAP.md` para tareas pendientes:
 - [En Progreso] **Fase 4 - Validación Satelital**: 15% (scripts CHIRPS listos, descarga y ejecución pendiente)
 - [En Espera] **Fase 5 - Documentación Final**: 10% (README actualizado, paper draft pendiente)
 
+## Resumen de Validación CHIRPS (2020)
+
+Se ejecutó la validación cruzada de las predicciones AE+DMD contra datos satelitales CHIRPS para el periodo de test (2020-11-07 a 2020-12-31). Los resultados completos y las figuras están en [reports/chirps_validation_summary.md](reports/chirps_validation_summary.md).
+
+Métricas globales (test period):
+
+- **ERA5 vs CHIRPS:** MAE = 2.011 mm/día, RMSE = 5.640 mm/día, R² = -0.009, Bias = +0.942 mm/día
+- **AE+DMD vs CHIRPS:** MAE = 1.871 mm/día, RMSE = 4.466 mm/día, R² = -1.737, Bias = +0.333 mm/día
+
+Observaciones rápidas:
+
+- R² negativos sugieren que la métrica R² lineal no captura bien la relación (distribución con muchos ceros y outliers); usar métricas de eventos/skill scores es recomendable.
+- El modelo AE+DMD muestra MAE y RMSE ligeramente menores que ERA5 en el periodo de test, aunque la correlación espacial es moderada.
+
+Figuras generadas (ver `reports/figures/`):
+
+- `chirps_spatial_comparison.png` — mapas comparativos ERA5 / CHIRPS / Predicción
+- `chirps_scatter_plots.png` — scatter ERA5 vs CHIRPS y Predicciones vs CHIRPS
+- `chirps_timeseries_regions.png` — series temporales por macrozona (Norte / Centro / Sur)
+
+Archivo de métricas extendidas: `data/processed/chirps_validation_metrics_extended.pkl`
+
 ### Stack Tecnológico Confirmado
 
 - **Datos**: xarray, netCDF4, pandas, numpy
