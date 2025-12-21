@@ -6,7 +6,6 @@ Copernicus Climate Data Store (CDS) utilizando la API oficial.
 
 Autor: César Godoy Delaigue
 Magíster Data Science UDD - 2025
-Colaboración: FlowHydro Consultores en Recursos Hídricos
 """
 
 import cdsapi
