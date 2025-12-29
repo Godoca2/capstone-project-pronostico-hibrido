@@ -305,14 +305,14 @@ El notebook `03_AE_DMD_Training.ipynb` ejecuta el pipeline completo:
 - Test MSE: 0.412, MAE: 0.319, RMSE: 0.642
 - Tiempo entrenamiento: ~56 segundos (con GPU)
 
-**Optimización de Hiperparámetros** (`05_Hyperparameter_Experiments.ipynb`):
+**Optimización de Hiperparámetros** (`06_Hyperparameter_Experiments.ipynb`):
 - 13 configuraciones evaluadas (latent_dim, SVD rank, dilations, epochs)
 - **Mejor configuración**: Dilations [1,3,9,27] + Latent 64
 - **MAE final**: 1.934 mm/día (17.3% mejora sobre baseline 2.339 mm/día)
 - Todos los modos DMD 100% estables (|λ|≤1)
 - Tiempo total: ~5 minutos (13 experimentos)
 
-**Interpretabilidad DMD** (`06_DMD_Interpretability.ipynb`):
+**Interpretabilidad DMD** (`07_DMD_Interpretability.ipynb`):
 - DMD entrenado en espacio latente: **23 modos**, 100% estables
 - Top 5 modos decodificados de latent (64-dim) → espacio físico (157×41)
 - **Análisis por macrozonas**:
@@ -324,7 +324,7 @@ El notebook `03_AE_DMD_Training.ipynb` ejecuta el pipeline completo:
 - Figuras generadas: 7 figuras (eigenvalues, spatial modes, energy zones, temporal evolution point, temporal zones, latent evolution)
 - Resultados guardados: `dmd_interpretability_results.pkl` (128 KB)
 
-**KoVAE - Predicciones Probabilísticas** (`04_KoVAE_Test.ipynb`):
+**KoVAE - Predicciones Probabilísticas** (`05_KoVAE_Test.ipynb`):
 - **Implementación completa** en `src/models/kovae.py` (407 líneas)
 - **Arquitectura**: Encoder probabilístico (μ, log σ²) → Koopman Layer (64×64) → Decoder
 - **Ventajas vs AE+DMD determinístico**:
@@ -353,7 +353,7 @@ El notebook `03_AE_DMD_Training.ipynb` ejecuta el pipeline completo:
 - [AVISO] **Próximo paso**: Cargar resultados AE+DMD y comparar métricas h=1, cuantificar valor agregado de incertidumbre
 - **Aplicaciones**: Análisis de riesgo climático, toma de decisiones bajo incertidumbre, planificación hídrica probabilística
 
-**Validación CHIRPS** (`07_CHIRPS_Validation.ipynb`):
+**Validación CHIRPS** (`08_CHIRPS_Validation.ipynb`):
 - Script `download_chirps.py` implementado para descargar datos satelitales
 - Fuente: Climate Hazards Group InfraRed Precipitation with Station data
 - Resolución: 0.05° (~5.5 km) vs ERA5 0.25° (~27.8 km)
@@ -370,7 +370,7 @@ Ver `ROADMAP.md` para tareas pendientes:
 4. [OK] ~~**Baselines**~~ - Persistencia y climatología implementados
 5. [OK] ~~**Optimización hiperparámetros**~~ - 13 configs, MAE 1.934 mm/día
 6. [OK] ~~**Interpretabilidad DMD**~~ - Modos decodificados a espacio físico
-7. **Validación CHIRPS** - Comparar con datos satelitales (opcional)
+7. [OK] ~~**Validación CHIRPS** - Comparar con datos satelitales (opcional)
 8. **KoVAE** - Implementar operador de Koopman variacional (opcional)
 9. **Resolver MLflow** - Conflicto protobuf (MLflow 3.6 vs TF 2.10)
 
@@ -378,7 +378,7 @@ Ver `ROADMAP.md` para tareas pendientes:
 
 ## Referencias y Metadatos
 
-**Última actualización**: 19 noviembre 2025 
+**Última actualización**: 21 diciembre 2025 
 **Responsable**: César Godoy Delaigue 
 **Fase actual**: Fase 3 - Optimización  (**Completada 100%**) → Iniciando Fase 4 
 **Notebooks ejecutados**: 7/8 principales (87.5%), todos funcionales 

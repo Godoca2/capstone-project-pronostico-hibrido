@@ -255,6 +255,136 @@ class KoVAE:
 
         return history
 
+    def train_sequence(
+        self,
+        X_seq,
+        X_val_seq=None,
+        epochs=50,
+        batch_size=8,
+        patience=10,
+        learning_rate=1e-4,
+    ):
+        """Entrenamiento para secuencias con término de consistencia Koopman.
+
+        X_seq: np.ndarray
+            Shape (n_samples, n_steps, lat, lon, 1)
+        """
+
+        if self.vae is None:
+            raise ValueError("Modelo no construido. Ejecutar build() primero.")
+
+        # Convertir a tensores
+        X_seq = tf.convert_to_tensor(X_seq, dtype=tf.float32)
+        if X_val_seq is not None:
+            X_val_seq = tf.convert_to_tensor(X_val_seq, dtype=tf.float32)
+
+        optimizer = keras.optimizers.Adam(learning_rate)
+
+        best_val_loss = np.inf
+        wait = 0
+
+        n_samples, n_steps = X_seq.shape[0], X_seq.shape[1]
+
+        # Dataset
+        dataset = tf.data.Dataset.from_tensor_slices(X_seq).shuffle(256).batch(batch_size)
+        val_dataset = None
+        if X_val_seq is not None:
+            val_dataset = tf.data.Dataset.from_tensor_slices(X_val_seq).batch(batch_size)
+
+        for epoch in range(epochs):
+            epoch_losses = []
+            for batch in dataset:
+                # batch: (batch_size, n_steps, lat, lon, 1)
+                with tf.GradientTape() as tape:
+                    recon_loss = 0.0
+                    koopman_loss = 0.0
+                    kl_loss = 0.0
+
+                    for t in range(n_steps - 1):
+                        X_t = batch[:, t, ...]
+                        X_tp1 = batch[:, t + 1, ...]
+
+                        # Encoder
+                        z_mean_t, z_log_var_t, z_t = self.encoder(X_t, training=True)
+                        z_mean_tp1, z_log_var_tp1, z_tp1 = self.encoder(X_tp1, training=True)
+
+                        # Reconstruction of X_t
+                        X_rec_t = self.decoder(z_t, training=True)
+                        recon_loss += tf.reduce_mean(tf.square(X_t - X_rec_t))
+
+                        # KL for t
+                        kl_t = -0.5 * tf.reduce_mean(1 + z_log_var_t - tf.square(z_mean_t) - tf.exp(z_log_var_t))
+                        kl_loss += kl_t
+
+                        # Koopman prediction in latent space
+                        z_t_pred = self.koopman_layer(z_t)
+                        koopman_loss += tf.reduce_mean(tf.square(z_tp1 - z_t_pred))
+
+                    # Average losses over time steps
+                    steps = tf.cast(n_steps - 1, tf.float32)
+                    recon_loss = recon_loss / steps
+                    kl_loss = kl_loss / steps
+                    koopman_loss = koopman_loss / steps
+
+                    total_loss = recon_loss + self.beta * kl_loss + self.gamma * koopman_loss
+
+                # Gradientes sobre todas las variables del VAE + Koopman
+                trainable_vars = self.vae.trainable_variables
+                grads = tape.gradient(total_loss, trainable_vars)
+                optimizer.apply_gradients(zip(grads, trainable_vars))
+
+                epoch_losses.append(total_loss.numpy())
+
+            # Validación simple
+            val_loss = None
+            if val_dataset is not None:
+                val_losses = []
+                for vbatch in val_dataset:
+                    recon_loss = 0.0
+                    koopman_loss = 0.0
+                    kl_loss = 0.0
+                    for t in range(n_steps - 1):
+                        X_t = vbatch[:, t, ...]
+                        X_tp1 = vbatch[:, t + 1, ...]
+
+                        z_mean_t, z_log_var_t, z_t = self.encoder(X_t, training=False)
+                        z_mean_tp1, z_log_var_tp1, z_tp1 = self.encoder(X_tp1, training=False)
+
+                        X_rec_t = self.decoder(z_t, training=False)
+                        recon_loss += tf.reduce_mean(tf.square(X_t - X_rec_t))
+                        kl_t = -0.5 * tf.reduce_mean(1 + z_log_var_t - tf.square(z_mean_t) - tf.exp(z_log_var_t))
+                        kl_loss += kl_t
+                        z_t_pred = self.koopman_layer(z_t)
+                        koopman_loss += tf.reduce_mean(tf.square(z_tp1 - z_t_pred))
+
+                    steps = tf.cast(n_steps - 1, tf.float32)
+                    recon_loss = recon_loss / steps
+                    kl_loss = kl_loss / steps
+                    koopman_loss = koopman_loss / steps
+                    total = recon_loss + self.beta * kl_loss + self.gamma * koopman_loss
+                    val_losses.append(total.numpy())
+
+                val_loss = float(np.mean(val_losses))
+
+            train_loss = float(np.mean(epoch_losses))
+            print(f"Epoch {epoch+1}/{epochs} — train_loss: {train_loss:.6f}" + (f" — val_loss: {val_loss:.6f}" if val_loss is not None else ""))
+
+            # Early stopping
+            if val_loss is not None:
+                if val_loss < best_val_loss:
+                    best_val_loss = val_loss
+                    wait = 0
+                else:
+                    wait += 1
+                    if wait >= patience:
+                        print("Early stopping: no mejora en validación")
+                        break
+
+        return {
+            'train_loss': train_loss,
+            'val_loss': val_loss
+        }
+
     def encode(self, X):
         """Codifica datos al espacio latente.
 
