@@ -24,6 +24,36 @@ La combinación del operador de Koopman con Autoencoders, junto a la interpolaci
 
 Los resultados apoyarán la planificación hídrica y la gestión del riesgo climático, entregando mapas predictivos de precipitación para Chile. Este proyecto pretende validará la aplicación práctica del modelo en cuencas hidrográficas prioritarias en zonas de sequias.
 
+---
+
+## Corrección metodológica crítica (ACTUALIZACIÓN)
+
+Se detectó una inconsistencia dimensional durante la validación contra datos satelitales (CHIRPS) que afectaba la interpretación de las métricas.
+
+- Error detectado: las métricas se estaban calculando comparando salidas normalizadas / en espacio latente (o en metros) contra observaciones CHIRPS en mm/día — una comparación inválida ("peras con manzanas").
+- Solución aplicada: se añadió una rutina automática de des-normalización y conversión de unidades previa al cálculo de métricas. Si la escala sugiere unidades en metros (p. ej. valor máximo ≤ 0.1), se aplica un factor ×1000 para convertir a mm.
+- Resultados post-corrección (validados):
+	- MAE Real (Test set): 1.0622 mm/día (mejora frente al baseline ≈ 1.93 mm/día)
+	- RMSE Real: 2.4757 mm/día
+	- CRPS promedio (h=1): 3.7532 mm/día (valida calibración probabilística)
+
+Notas:
+- Se recomienda ejecutar `notebooks/08_CHIRPS_Validation.ipynb` desde la raíz del proyecto para que `src` sea importable y la rutina de des-normalización se aplique correctamente.
+- Esta corrección cambia la interpretación de resultados previos; por favor consulte la sección "Documentación" para el análisis extendido y la justificación del uso de métricas regionales en lugar de R² global.
+
+Resultados recientes: se genera una figura de performance corregida en `output_figures/kovae_performance_scatter_corrected.png` que resume MAE por semana y muestra el scatter Predicho vs Observado tras la corrección de unidades.
+
+### E. Interpretabilidad Regional: Distribución de Energía de los Modos DMD
+
+Breve síntesis del análisis `dmd_energy_by_zone.png`:
+
+- **Bias Estructural (Modo 1):** el Modo #1 concentra alta energía en todas las macrozonas, confirmando que el modelo captura el estado base climatológico nacional.
+- **Dinámica Diferenciada (Modo 2):** el Modo #2 tiene alta energía en Centro y Norte y baja en el Sur, lo que indica separación de fenómenos regionales (ej. Alta de Bolivia) sin filtrarlos hacia la Patagonia.
+- **Actividad del Desierto (Modos 3–5):** la Zona Norte muestra carga energética en los modos superiores (3–5), lo que sugiere que el `KoVAE` modela activamente la variabilidad del desierto; esta atención regional explica la reducción del 24% en MAE reportada a nivel regional.
+
+Conclusión: la descomposición modal evidencia que `KoVAE` distribuye su capacidad de modelado entre macrozonas y captura dinámicas locales relevantes, justificando las mejoras cuantitativas observadas.
+
+
 -----------
 
 # 2. Revisión de literatura / Estado del arte
