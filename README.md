@@ -27,7 +27,7 @@
 
 Este proyecto desarrolla un sistema híbrido de pronóstico de precipitaciones para Chile continental, combinando **Aprendizaje Profundo** (Autoencoders Convolucionales), **Análisis de Sistemas Dinámicos** (DMD - Dynamic Mode Decomposition) y **Geoestadística** (Kriging y Variogramas).
 
-### Resultados Principales
+<!-- ### Resultados Principales
 
 | Métrica | Valor |
 |---------|-------|
@@ -35,7 +35,7 @@ Este proyecto desarrolla un sistema híbrido de pronóstico de precipitaciones p
 | **Mejora vs Persistence** | +7.1% |
 | **Mejora vs Climatología** | +12.9% |
 | **Compresión espacial** | 100.3× (6,437 → 64 dim) |
-| **Validación CHIRPS** | +7% mejor que ERA5 crudo |
+| **Validación CHIRPS** | +7% mejor que ERA5 crudo | -->
 
 > **⚠️ NOTA:** Los archivos de datos grandes (NetCDF, modelos entrenados) no están incluidos por limitaciones de GitHub. Ver **[DATA_README.md](DATA_README.md)** para instrucciones de descarga.
 
@@ -99,7 +99,7 @@ La predicción de variables climáticas ha evolucionado desde métodos estadíst
 ┌─────────────────────────────────────┐
 │         INGESTA DE DATOS            │
 │   ERA5 Reanalysis (0.25°, horario)  │
-│   366 días 2020, Grid 157×41       │
+│   366 días 2020, Grid 157×41        │
 └─────────────────────────────────────┘
                   ↓
 ┌─────────────────────────────────────┐
@@ -138,17 +138,17 @@ La predicción de variables climáticas ha evolucionado desde métodos estadíst
 
 ```
 ┌─────────────────────────────────────┐
-│     DATOS PREPROCESADOS           │
-│   Split: 70% / 15% / 15%          │
+│     DATOS PREPROCESADOS             │
+│   Split: 70% / 15% / 15%            │
 └─────────────────────────────────────┘
                   ↓
 ┌─────────────────────────────────────┐
-│      STANDARD SCALER              │
-│   Media=0, Varianza=1             │
+│      STANDARD SCALER                │
+│   Media=0, Varianza=1               │
 └─────────────────────────────────────┘
                   ↓
 ┌─────────────────────────────────────┐
-│   AUTOENCODER DETERMINÍSTICO      │
+│   AUTOENCODER DETERMINÍSTICO        │
 │   - Encoder: Conv2D dilatadas       │
 │   - Latent: 64 dim                  │
 │   - Decoder: Conv2DTranspose        │
@@ -168,7 +168,7 @@ La predicción de variables climáticas ha evolucionado desde métodos estadíst
 └─────────────────────────────────────┘
                   ↓
 ┌─────────────────────────────────────┐
-│      PREDICCIÓN PROMEDIO           │
+│      PREDICCIÓN PROMEDIO            │
 │   Una única predicción determinista │
 └─────────────────────────────────────┘
 ```
@@ -184,18 +184,18 @@ La predicción de variables climáticas ha evolucionado desde métodos estadíst
 
 ```
 ┌─────────────────────────────────────┐
-│     DATOS PREPROCESADOS           │
-│   Split: 80% / 10% / 10%          │
+│     DATOS PREPROCESADOS             │
+│   Split: 80% / 10% / 10%            │
 │   (Mayor densidad para VAE)         │
 └─────────────────────────────────────┘
                   ↓
 ┌─────────────────────────────────────┐
-│      MINMAX SCALER [0,1]           │
+│      MINMAX SCALER [0,1]            │
 │   (Evita KL collapse)               │
 └─────────────────────────────────────┘
                   ↓
 ┌─────────────────────────────────────┐
-│     ENCODER PROBABILÍSTICO         │
+│     ENCODER PROBABILÍSTICO          │
 │   - Conv2D → Flatten → Dense        │
 │   - Output: μ (media), σ (varianza) │
 │   - Sampling: z = μ + σ·ε           │
@@ -203,7 +203,7 @@ La predicción de variables climáticas ha evolucionado desde métodos estadíst
 └─────────────────────────────────────┘
                   ↓
 ┌─────────────────────────────────────┐
-│     OPERADOR DE KOOPMAN (K)        │
+│     OPERADOR DE KOOPMAN (K)         │
 │   - Matriz lineal 128×128           │
 │   - Evolución: z_{t+1} = K·z_t      │
 │   - Proyección multi-step: K^h      │
@@ -216,7 +216,7 @@ La predicción de variables climáticas ha evolucionado desde métodos estadíst
 └─────────────────────────────────────┘
                   ↓
 ┌─────────────────────────────────────┐
-│    PREDICCIÓN PROBABILÍSTICA       │
+│    PREDICCIÓN PROBABILÍSTICA        │
 │   - 30 muestras Monte Carlo         │
 │   - Intervalos de confianza 95%     │
 │   - Mapas de incertidumbre          │
@@ -237,31 +237,31 @@ La predicción de variables climáticas ha evolucionado desde métodos estadíst
 
 ```
 ┌─────────────────────────────────────┐
-│       PREDICCIONES                │
+│       PREDICCIONES                  │
 │   AE+DMD (determinista)             │
 │         vs                          │
 │   KoVAE (probabilística)            │
 └─────────────────────────────────────┘
                   ↓
 ┌─────────────────────────────────────┐
-│      JUEZ INDEPENDIENTE            │
+│      JUEZ INDEPENDIENTE             │
 │   CHIRPS Satelital (0.05°)          │
 │   Resolución 5× mejor que ERA5      │
 └─────────────────────────────────────┘
                   ↓
 ┌─────────────────────────────────────┐
-│      MÉTRICAS COMPARATIVAS         │
+│      MÉTRICAS COMPARATIVAS          │
 │   - MAE por macrozona               │
 │   - Bias regional                   │
 │   - CSI (eventos extremos)          │
 └─────────────────────────────────────┘
                   ↓
-┌─────────────────────────────────────┐
-│         RESULTADO FINAL            │
-│   KoVAE gana: MAE 1.07 vs 1.87      │
-│   Norte: +24.3% mejor               │
-│   Sur: +28.3% mejor                 │
-└─────────────────────────────────────┘
+┌────────────────────────────────────────────────┐
+│         RESULTADO FINAL                        │
+│  Mejor Desenpeño KoVAE mejor: MAE 1.07 vs 1.87 │
+│  Norte: +24.3% mejor                           │
+│  Sur: +28.3% mejor                             │
+└────────────────────────────────────────────────┘
 ```
 
 **Conclusión clave:** KoVAE corrige "lluvia fantasma" en el Norte (zona árida) gracias al operador de Koopman.
@@ -356,7 +356,7 @@ La predicción de variables climáticas ha evolucionado desde métodos estadíst
 |--------|------------------------|----------------|
 | **ERA5 Reanalysis** | 2.0112 | - (baseline) |
 | **AE+DMD** | 1.8708 | +7.0% |
-| **KoVAE (Ganador)** | **1.0638** | **+47.1%** |
+| **KoVAE (mejor)** | **1.0638** | **+47.1%** |
 
 **Desempeño Regional (KoVAE vs ERA5):**
 
