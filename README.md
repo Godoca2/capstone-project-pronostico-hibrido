@@ -328,7 +328,7 @@ La predicción de variables climáticas ha evolucionado desde métodos estadíst
 
 | Métrica | Valor | Intervalo 95% |
 |---------|-------|---------------|
-| **MAE Real** | **1.070 mm/día** | [0.982, 1.158] |
+| **MAE Real** | **1.068 mm/día** | [0.982, 1.158] |
 | **RMSE Real** | **2.457 mm/día** | [2.203, 2.711] |
 | **CRPS** | 3.805 mm/día | [3.512, 4.098] |
 
