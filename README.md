@@ -10,7 +10,7 @@ Este proyecto propone un modelo híbrido de pronóstico espacio-temporal de prec
 
 3. **El operador de Koopman**, incorporado mediante el enfoque **KoVAE**, que permite representar dinámicas no lineales de forma lineal en el espacio latente, mejorando la capacidad predictiva y probabilística.
 
-4. **Geoestadística y teledetección**, empleando técnicas de kriging y co-kriging junto con datos satelitales (CHIRPS, GPM y MODIS) para generar mallas continuas y coherentes espacialmente.
+4. **Geoestadística y teledetección**, empleando técnicas de kriging y co-kriging junto con datos satelitales (CHIRPS) para generar mallas continuas y coherentes espacialmente.
 
 # Pregunta de investigación:
 
@@ -26,11 +26,11 @@ Los resultados apoyarán la planificación hídrica y la gestión del riesgo cli
 
 ---
 
-## Corrección metodológica crítica (ACTUALIZACIÓN)
+## Corrección metodológica 
 
 Se detectó una inconsistencia dimensional durante la validación contra datos satelitales (CHIRPS) que afectaba la interpretación de las métricas.
 
-- Error detectado: las métricas se estaban calculando comparando salidas normalizadas / en espacio latente (o en metros) contra observaciones CHIRPS en mm/día — una comparación inválida ("peras con manzanas").
+- Error detectado: las métricas se estaban calculando comparando salidas normalizadas / en espacio latente (o en metros) contra observaciones CHIRPS en mm/día — una comparación inválida.
 - Solución aplicada: se añadió una rutina automática de des-normalización y conversión de unidades previa al cálculo de métricas. Si la escala sugiere unidades en metros (p. ej. valor máximo ≤ 0.1), se aplica un factor ×1000 para convertir a mm.
 - Resultados post-corrección (validados):
 	- MAE Real (Test set): 1.0622 mm/día (mejora frente al baseline ≈ 1.93 mm/día)

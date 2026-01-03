@@ -985,6 +985,7 @@ x(t+h) = Aʰ x(t)
 | Versión | Fecha | Cambios |
 |---------|-------|---------|
 | 1.0 | 23-Nov-2025 | Versión inicial completa |
+| 1.1 | 24-Ene-2025 | Validación post-ejecución pipeline completo |
 
 ---
 

@@ -1,10 +1,10 @@
-# 📁 Guía de Datos del Proyecto
+# Guía de Datos del Proyecto
 
-## ⚠️ Archivos de Datos No Incluidos en el Repositorio
+## Archivos de Datos No Incluidos en el Repositorio
 
 Por limitaciones de tamaño de GitHub (límite 100MB por archivo), los siguientes archivos de datos **NO están incluidos** en este repositorio pero son necesarios para ejecutar los notebooks:
 
-### 📊 Datos Requeridos
+### Datos Requeridos
 
 #### 1. **ERA5 Precipitation Data**
 - **Archivo:** `data/processed/era5_precipitation_chile_full.nc`
@@ -44,13 +44,21 @@ Por limitaciones de tamaño de GitHub (límite 100MB por archivo), los siguiente
   ```
   Este archivo se genera automáticamente al ejecutar todas las celdas.
 
-#### 4. **Modelos Entrenados** (Opcional)
+#### 4. **Modelos Entrenados** (Disponibles en repositorio)
 - **Archivos:** 
-  - `data/models/autoencoder_geostat.h5` (~4 MB)
-  - `data/models/encoder_geostat.h5` (~2 MB)
-  - `data/models/kovae_trained/kovae_full.h5` (~65 MB)
-- **Descripción:** Pesos entrenados de modelos (opcional, se pueden reentrenar)
-- **Cómo generar:**
+  - `data/models/autoencoder_geostat.h5` (~4 MB) - AE+DMD baseline
+  - `data/models/encoder_geostat.h5` (~2 MB) - Encoder standalone
+  - `data/models/kovae_trained/kovae_full.h5` (~42 MB) - KoVAE completo
+  - `data/models/kovae_trained/encoder.h5` - Encoder probabilístico
+  - `data/models/kovae_trained/decoder.h5` - Decoder generativo
+  - `data/models/kovae_trained/koopman_matrix.npy` - Matriz K 64×64
+  - `data/models/kovae_trained/config.pkl` - Configuración
+  - `data/models/training_metrics.csv` - Métricas de entrenamiento
+- **Descripción:** Pesos entrenados de modelos (pipeline completo ejecutado)
+- **Métricas validadas:**
+  - AE+DMD: MAE=1.763 mm/día, mejora +7.1% vs Persistence
+  - KoVAE: MAE reconstrucción=0.0029 mm/día
+- **Cómo regenerar:**
   ```bash
   # Entrenar modelos desde cero
   jupyter notebook notebooks/03_AE_DMD_Training.ipynb  # AE+DMD
@@ -59,7 +67,7 @@ Por limitaciones de tamaño de GitHub (límite 100MB por archivo), los siguiente
 
 ---
 
-## 🚀 Setup Rápido (Reproducción Completa)
+## Setup Rápido (Reproducción Completa)
 
 ### Opción 1: Desde Cero (Recomendado para Reproducibilidad)
 
@@ -108,7 +116,7 @@ jupyter notebook notebooks/
 
 ---
 
-## 📥 Descarga de Datos Pre-procesados
+## Descarga de Datos Pre-procesados
 
 **Para revisores del proyecto (Profesor Guía, Comisión Evaluadora):**
 
@@ -135,7 +143,7 @@ data/
 
 ---
 
-## 🔍 Verificación de Datos
+## Verificación de Datos
 
 Para verificar que todos los datos necesarios están presentes:
 
@@ -161,7 +169,7 @@ for file_path in required_files:
 
 ---
 
-## 📋 Estructura de Datos Esperada
+## Estructura de Datos Esperada
 
 ```
 CAPSTONE_PROJECT/
@@ -172,28 +180,46 @@ CAPSTONE_PROJECT/
 │   ├── processed/
 │   │   ├── era5_precipitation_chile_full.nc
 │   │   ├── kriging_precipitation_june_2020.nc
-│   │   └── *.csv (métricas generadas)
+│   │   ├── metrics_summary.csv
+│   │   └── kovae_worst_cells_examples.csv
 │   ├── models/
-│   │   ├── autoencoder_geostat.h5
+│   │   ├── autoencoder_geostat.h5 (AE+DMD baseline)
 │   │   ├── encoder_geostat.h5
-│   │   └── kovae_trained/
-│   │       └── kovae_full.h5
+│   │   ├── training_metrics.csv
+│   │   ├── kovae_trained/
+│   │   │   ├── kovae_full.h5
+│   │   │   ├── encoder.h5
+│   │   │   ├── decoder.h5
+│   │   │   ├── koopman_matrix.npy
+│   │   │   └── config.pkl
+│   │   ├── ablation/
+│   │   └── ablation_long/
 │   └── raw/
-│       └── precipitation_data.npy (datos temporales)
+│       └── precipitation_data.npy
 ├── notebooks/
-│   └── *.ipynb (8 notebooks principales)
-├── src/
-│   └── utils/
-│       ├── download_era5.py (descarga datos)
-│       └── data_loader.py (carga unificada)
-└── reports/
-    └── figures/
-        └── *.png (figuras generadas automáticamente)
+│   ├── 01_EDA_Spatiotemporal.ipynb
+│   ├── 02_Geoestadistica_Variogramas_Kriging.ipynb
+│   ├── 03_AE_DMD_Training.ipynb
+│   ├── 04_Advanced_Metrics.ipynb
+│   ├── 05_KoVAE_Test.ipynb
+│   ├── 06_Hyperparameter_Experiments.ipynb
+│   ├── 07_DMD_Interpretability.ipynb
+│   └── 08_CHIRPS_Validation.ipynb
+├── reports/
+│   ├── figures/ (65+ figuras generadas)
+│   ├── chirps_validation_summary.md
+│   ├── ablation_report.md
+│   └── metrics_eval.csv
+└── src/
+    └── utils/
+        ├── download_era5.py
+        ├── download_chirps.py
+        └── metrics.py
 ```
 
 ---
 
-## ⚙️ Requisitos del Sistema
+## Requisitos del Sistema
 
 ### Mínimos
 - **Python:** 3.9+
@@ -209,7 +235,7 @@ CAPSTONE_PROJECT/
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Error: "FileNotFoundError: era5_precipitation_chile_full.nc"
 **Solución:** Descargar datos ERA5 siguiendo instrucciones arriba.
@@ -228,7 +254,7 @@ pip install pydmd
 
 ---
 
-## 📞 Contacto
+## Contacto
 
 **Autor:** César Godoy Delaigue  
 **Institución:** Universidad del Desarrollo (UDD)  
