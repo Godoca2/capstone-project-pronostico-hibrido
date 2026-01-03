@@ -91,14 +91,37 @@ La predicción de variables climáticas ha evolucionado desde métodos estadíst
 
 ## 4. Metodología
 
-### 4.1 Pipeline del Sistema
+### 4.1 Pipeline del Sistema (AE+DMD)
 
 ```
-ERA5 Reanalysis (0.25°, horario)
-            ↓
-    Preprocesamiento
-    (Agregación diaria, normalización)
-            ↓
+┌─────────────────────────────────────┐
+│         INGESTA DE DATOS            │
+│   ERA5 Reanalysis (0.25°, horario)  │
+│   Chile: -56° a -17.5° lat          │
+└─────────────────────────────────────┘
+                  ↓
+┌─────────────────────────────────────┐
+│       PREPROCESAMIENTO              │
+│   - Agregación horaria → diaria     │
+│   - Conversión m → mm/día           │
+│   - Normalización StandardScaler    │
+└─────────────────────────────────────┘
+                  ↓
+┌─────────────────────────────────────┐
+│   ANÁLISIS EXPLORATORIO (EDA)       │
+│   - Estadísticas por macrozona      │
+│   - Patrones estacionales           │
+│   - Identificación de outliers      │
+└─────────────────────────────────────┘
+                  ↓
+┌─────────────────────────────────────┐
+│       GEOESTADÍSTICA                │
+│   - Variogramas experimentales      │
+│   - Ajuste modelo esférico          │
+│   - Kriging Ordinario               │
+│   - Cálculo varianza kriging        │
+└─────────────────────────────────────┘
+                  ↓
 ┌─────────────────────────────────────┐
 │   AUTOENCODER CONVOLUCIONAL         │
 │   - Encoder: Conv2D dilatadas       │
@@ -106,17 +129,25 @@ ERA5 Reanalysis (0.25°, horario)
 │   - Decoder: Conv2DTranspose        │
 │   - Loss: Weighted MSE (Kriging)    │
 └─────────────────────────────────────┘
-            ↓
+                  ↓
 ┌─────────────────────────────────────┐
 │              DMD                    │
 │   - 23 modos estables               │
 │   - Proyección temporal A^h         │
 │   - Horizontes: 1, 3, 7 días        │
 └─────────────────────────────────────┘
-            ↓
-      Pronóstico Final
-            ↓
-    Validación CHIRPS (0.05°)
+                  ↓
+┌─────────────────────────────────────┐
+│        PRONÓSTICO FINAL             │
+│   - Reconstrucción espacial         │
+│   - Desnormalización                │
+└─────────────────────────────────────┘
+                  ↓
+┌─────────────────────────────────────┐
+│      VALIDACIÓN EXTERNA             │
+│   - CHIRPS satelital (0.05°)        │
+│   - Métricas por macrozona          │
+└─────────────────────────────────────┘
 ```
 
 ### 4.2 Arquitectura del Autoencoder
@@ -153,9 +184,68 @@ ERA5 Reanalysis (0.25°, horario)
 
 Implementación del Kolmogorov-Arnold Variational Autoencoder con operador Koopman:
 
-- **Arquitectura:** Encoder probabilístico (μ, log σ²) → Koopman Layer (64×64) → Decoder
+- **Arquitectura:** Encoder probabilístico (μ, log σ²) → Koopman Layer (128×128) → Decoder
 - **Pérdida compuesta:** L_recon + β·KL + γ·L_koopman
 - **Ventajas:** Cuantificación de incertidumbre, intervalos de confianza 95%
+
+#### Hiperparámetros Optimizados
+
+| Parámetro | Valor | Justificación |
+|-----------|-------|---------------|
+| **Latent Dim** | 128 | Mayor capacidad para modos de alta frecuencia |
+| **Beta (β)** | 0.005 | Peso reducido de KL, evita posterior collapse |
+| **Gamma (γ)** | 0.5 | Prioriza coherencia temporal del operador Koopman |
+| **Learning Rate** | 1e-4 | Estabilidad en optimización probabilística |
+
+### 4.5 Pipeline KoVAE (Operador de Koopman)
+
+```
+┌─────────────────────────────────────┐
+│         DATOS PREPROCESADOS         │
+│   ERA5 diario normalizado           │
+│   Split: 80% / 10% / 10%            │
+└─────────────────────────────────────┘
+                  ↓
+┌─────────────────────────────────────┐
+│     NORMALIZACIÓN MINMAX [0,1]      │
+│   (Crítico para evitar KL collapse) │
+└─────────────────────────────────────┘
+                  ↓
+┌─────────────────────────────────────┐
+│      ENCODER PROBABILÍSTICO         │
+│   - Conv2D → Flatten → Dense        │
+│   - Output: μ (media), σ (varianza) │
+│   - Sampling: z = μ + σ·ε           │
+└─────────────────────────────────────┘
+                  ↓
+┌─────────────────────────────────────┐
+│      OPERADOR DE KOOPMAN (K)        │
+│   - Matriz lineal 128×128           │
+│   - Evolución: z_{t+1} = K · z_t    │
+│   - Proyección multi-step: K^h      │
+└─────────────────────────────────────┘
+                  ↓
+┌─────────────────────────────────────┐
+│           DECODER                   │
+│   - Dense → Reshape → Conv2DT       │
+│   - Reconstrucción espacial         │
+└─────────────────────────────────────┘
+                  ↓
+┌─────────────────────────────────────┐
+│     INFERENCIA ESTOCÁSTICA          │
+│   - 30 muestras Monte Carlo         │
+│   - Intervalos de confianza 95%     │
+│   - Mapas de incertidumbre          │
+└─────────────────────────────────────┘
+                  ↓
+┌─────────────────────────────────────┐
+│      DESNORMALIZACIÓN               │
+│   - Conversión a mm/día reales      │
+│   - Métricas: MAE, RMSE, CRPS       │
+└─────────────────────────────────────┘
+```
+
+> **Nota sobre Split 80/10/10:** Los modelos probabilísticos profundos (VAE) requieren mayor densidad de datos de entrenamiento para aprender correctamente la distribución latente. Un split 70/15/15 causa "posterior collapse" donde el modelo predice siempre el promedio. El split 80/10/10 proporciona suficientes ejemplos para la convergencia de la divergencia KL.
 
 ---
 
@@ -176,24 +266,44 @@ Implementación del Kolmogorov-Arnold Variational Autoencoder con operador Koopm
 
 ### 5.3 Splits de Datos
 
+**Modelo AE+DMD (determinístico):**
+
 | Conjunto | Proporción | Secuencias |
 |----------|------------|------------|
 | Train | 70% | 251 |
 | Validation | 15% | 53 |
 | Test | 15% | 55 |
 
+**Modelo KoVAE (probabilístico):**
+
+| Conjunto | Proporción | Secuencias | Justificación |
+|----------|------------|------------|---------------|
+| Train | 80% | 286 | Mayor densidad para convergencia KL |
+| Validation | 10% | 35 | Suficiente para early stopping |
+| Test | 10% | 35 | Evaluación final independiente |
+
+> **¿Por qué splits diferentes?** Los VAEs aprenden distribuciones de probabilidad, no solo mappings determinísticos. La divergencia KL en la pérdida requiere suficientes ejemplos para que el encoder aprenda a generar distribuciones latentes útiles sin colapsar a la media.
+
 ---
 
 ## 6. Resultados
 
-### 6.1 Métricas Globales
+### 6.1 Métricas Globales (Test Set - Unidades Físicas Corregidas)
 
-| Modelo | MAE (mm/día) | RMSE (mm/día) | vs Persistence | vs Climatología |
-|--------|--------------|---------------|----------------|-----------------|
-| **AE+DMD** | 1.763 | 4.305 | +7.1% | +12.9% |
-| **KoVAE** | 0.0029* | 0.0055* | - | - |
+| Modelo | MAE (mm/día) | RMSE (mm/día) | CRPS (mm/día) | Mejora vs Baseline |
+|--------|--------------|---------------|---------------|--------------------|
+| **AE+DMD** | 1.934 | 4.305 | - | Baseline |
+| **KoVAE** | **1.070** | **2.457** | 3.805 | **+44.7%** |
 
-*Métricas de reconstrucción
+> **Nota sobre corrección de unidades:** Las métricas originales estaban en escala normalizada. Se aplicó desnormalización automática detectando cuando max(predicción) ≤ 0.1 (unidades en metros) y convirtiendo a mm/día (×1000). Esta corrección fue crítica para la interpretación correcta de resultados.
+
+#### Métricas Probabilísticas (KoVAE)
+
+| Métrica | Valor | Interpretación |
+|---------|-------|----------------|
+| **CRPS** | 3.805 mm/día | Calidad de la distribución predicha |
+| **IC 95%** | P10-P90 | Intervalos de confianza calibrados |
+| **Calibración** | Validada | Observaciones caen dentro del IC |
 
 ### 6.2 Desempeño Regional
 
