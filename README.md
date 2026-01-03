@@ -76,38 +76,6 @@ Lam et al. (2023) y Wong (2023) evidenciaron el potencial del AI aplicado a la p
 
 Cressie & Wikle (2011) fundamentaron la geoestadística espaciotemporal como marco probabilístico para modelar dependencias espaciales.
 
----
-
-## Glosario de Conceptos Técnicos
-
-### **Autoencoder (AE)**
-Red neuronal no supervisada que comprime datos (encoder) y los reconstruye (decoder). Usado para capturar patrones espaciales de precipitación en representación compacta.
-
-### **Espacio Latente**
-Representación de menor dimensión (ej: 64-dim) de datos originales (6437 celdas). Reduce complejidad preservando información esencial.
-
-### **DMD (Descomposición Modal Dinámica)**
-Técnica data-driven que descompone sistemas dinámicos en modos espacio-temporales coherentes. Extrae patrones + frecuencias para pronósticos.
-
-### **KoVAE (Koopman Variational Autoencoder)**
-Extensión probabilística del Autoencoder que usa el Operador de Koopman para representar dinámicas no lineales como lineales. Incluye incertidumbre.
-
-### **Variograma**
-Función que cuantifica correlación espacial vs distancia. Parámetros: nugget (error), sill (varianza máx), range (alcance correlación).
-
-### **Kriging**
-Interpolación geoestadística óptima que genera campos continuos + varianza de estimación a partir de observaciones puntuales.
-
-### **Dilated Convolutions**
-Convoluciones con "huecos" que expanden campo receptivo sin aumentar parámetros. Captura contexto multi-escala.
-
-### **Métricas**
-- **MAE**: Error promedio absoluto (mm/día)
-- **RMSE**: Raíz error cuadrático medio
-- **NSE**: Eficiencia Nash-Sutcliffe (hidrología)
-- **Skill Score**: Mejora % vs baseline
-
----
 
 ## Estructura del Proyecto
 
@@ -137,17 +105,17 @@ CAPSTONE_PROJECT/
 │ ├── 04_KoVAE_Test.ipynb # [OK] KoVAE predicciones probabilísticas (93% completo)
 │ ├── 05_Hyperparameter_Experiments.ipynb # [OK] Optimización 13 configs
 │ ├── 06_DMD_Interpretability.ipynb # [OK] Interpretabilidad DMD (modos físicos)
-│ └── 07_CHIRPS_Validation.ipynb # [En Espera] Validación satelital (preparado)
+│ └── 07_CHIRPS_Validation.ipynb # [OK] Validación satelital
 │
 ├── src/
 │ ├── models/
 │ │ ├── ae_dmd.py # Modelo AE+DMD
 │ │ ├── ae_keras.py # Arquitectura autoencoder
-│ │ ├── kovae.py # [OK] KoVAE implementado (400+ líneas)
+│ │ ├── kovae.py # [OK] KoVAE implementado
 │ │ └── __init__.py
 │ ├── utils/
 │ │ ├── download_era5.py # Descarga desde Copernicus CDS
-│ │ ├── download_chirps.py # [OK] Descarga CHIRPS (datos satelitales)
+│ │ ├── download_chirps.py # Descarga CHIRPS (datos satelitales)
 │ │ ├── merge_era5.py # Concatenación NetCDF
 │ │ ├── merge_era5_advanced.py # Procesamiento avanzado
 │ │ ├── data_loader.py # Carga de datos
@@ -166,11 +134,11 @@ CAPSTONE_PROJECT/
 │ ├── dmd_eigenvalues_complex_plane.png # Eigenvalores DMD
 │ ├── dmd_spatial_modes_decoded.png # Top 5 modos decodificados
 │ ├── dmd_energy_by_zone.png # Energía por macrozona
-│ ├── kovae_training_curves.png # [OK] KoVAE: Curvas entrenamiento
-│ ├── kovae_reconstruction.png # [OK] KoVAE: Comparación reconstrucción
-│ ├── kovae_probabilistic_forecast.png # [OK] KoVAE: Predicciones con IC 95%
-│ ├── kovae_uncertainty_analysis.png # [OK] KoVAE: Análisis incertidumbre espacial
-│ └── kovae_predictions_by_region.png # [OK] KoVAE: Distribuciones regionales
+│ ├── kovae_training_curves.png # KoVAE: Curvas entrenamiento
+│ ├── kovae_reconstruction.png # KoVAE: Comparación reconstrucción
+│ ├── kovae_probabilistic_forecast.png # KoVAE: Predicciones con IC 95%
+│ ├── kovae_uncertainty_analysis.png # KoVAE: Análisis incertidumbre espacial
+│ └── kovae_predictions_by_region.png # KoVAE: Distribuciones regionales
 │
 ├── mlruns/ # Tracking MLflow (temporal deshabilitado)
 │
@@ -249,9 +217,9 @@ jupyter notebook notebooks/
 El notebook `03_AE_DMD_Training.ipynb` ejecuta el pipeline completo:
 
 - Carga datos ERA5 2020 normalizados
-- Construye arquitectura CNN informada por geoestadística (receptive field ~8.23°)
+- Construye arquitectura CNN informada por geoestadística (receptive field ~8.15°)
 - Loss ponderado espacialmente por varianza kriging
-- Entrenamiento con GPU (NVIDIA RTX A4000): ~56 segundos
+- Entrenamiento con GPU (NVIDIA RTX A4000)
 - Evaluación de reconstrucción en test set
 
 **Resultados actuales**:
@@ -290,17 +258,18 @@ El notebook `03_AE_DMD_Training.ipynb` ejecuta el pipeline completo:
 
 - Cálculo de variogramas experimentales (junio 2020)
 - Ajuste de modelos: spherical, exponential, gaussian
-- **Mejor ajuste (spherical)**: range=8.23°, sill=23.45, nugget≈0
+- **Mejor ajuste (spherical)**: range=8.15°, sill=23.67, nugget≈0
 - Ordinary Kriging con PyKrige (malla 391×101)
 - Varianza kriging usada para **pesos espaciales** en loss function
 - Validación leave-one-out cross-validation
+- Kriging: Se utiliza la varianza de estimación del Kriging Ordinario para ponderar la función de pérdida del modelo, forzando a la red a aprender más en zonas de alta confianza estadística.
 
 ### Arquitectura del Autoencoder
 
 **Diseño informado por variogramas** (`03_AE_DMD_Training.ipynb`):
 
 - **Encoder**: Dilated CNN (dilations=[1,2,4,8])
- - Receptive field ~40 celdas (cumple range 8.23° del variograma)
+ - Receptive field ~40 celdas (cumple range 8.15° del variograma)
  - MaxPooling 2×2 (3 capas) → compresión espacial
  - Bottleneck: 64-dim latent space
  
@@ -355,7 +324,7 @@ El notebook `03_AE_DMD_Training.ipynb` ejecuta el pipeline completo:
 - Resultados guardados: `dmd_interpretability_results.pkl` (128 KB)
 
 **KoVAE - Predicciones Probabilísticas** (`05_KoVAE_Test.ipynb`):
-- **Implementación completa** en `src/models/kovae.py` (407 líneas)
+- **Implementación completa** en `src/models/kovae.py`
 - **Arquitectura**: Encoder probabilístico (μ, log σ²) → Koopman Layer (64×64) → Decoder
 - **Ventajas vs AE+DMD determinístico**:
  - Cuantificación de incertidumbre espacial y temporal
@@ -363,9 +332,13 @@ El notebook `03_AE_DMD_Training.ipynb` ejecuta el pipeline completo:
  - Operador Koopman para evolución linealizada de dinámicas no lineales
  - Distribuciones completas (no solo media puntual)
 - **Entrenamiento exitoso**:
- - 19 epochs (early stopping), ~22 segundos con GPU
- - Loss: train=3.67e-05, val=2.0144e-05
- - **Reconstrucción excepcional**: MAE=0.0029 mm/día, RMSE=0.0055 mm/día
+**Splits**:
+- Train: 251 sequences (80%)
+- Validation: 53 sequences (10%)
+- Test: 55 sequences (10%)
+- 19 epochs (early stopping), ~22 segundos con GPU
+- Loss: train=3.67e-05, val=2.0144e-05
+- **Reconstrucción excepcional**: MAE=0.0029 mm/día, RMSE=0.0055 mm/día
 - **Predicciones multistep**: h=1 a h=7 días con incertidumbres propagadas
 - **Pérdida compuesta**: L_recon (MSE) + β*KL (divergencia latente) + γ*L_koopman (coherencia temporal)
 - **5 visualizaciones generadas**:
@@ -375,10 +348,13 @@ El notebook `03_AE_DMD_Training.ipynb` ejecuta el pipeline completo:
  4. Uncertainty analysis (mapas espaciales por horizonte h=1 a h=7)
  5. Regional distributions (histogramas Norte/Centro/Sur)
 - **Modelo guardado completo**: `data/models/kovae_trained/`
- - kovae_full.h5 (modelo completo)
- - encoder.h5, decoder.h5 (componentes)
- - koopman_matrix.npy (matriz K 64×64)
- - config.pkl (hiperparámetros)
+- kovae_full.h5 (modelo completo)
+- encoder.h5, decoder.h5 (componentes)
+- koopman_matrix.npy (matriz K 64×64)
+- config.pkl (hiperparámetros)
+
+Nota: Para el KoVAE se aumentó el set de entrenamiento al 80% para maximizar la densidad de datos necesaria para la convergencia de la divergencia KL (aprendizaje de distribución) y evitar el colapso posterior.
+
 - **Notebook ejecutado**: 13/14 celdas (93%), celda 11 (comparación vs AE+DMD) pendiente
 - [AVISO] **Próximo paso**: Cargar resultados AE+DMD y comparar métricas h=1, cuantificar valor agregado de incertidumbre
 - **Aplicaciones**: Análisis de riesgo climático, toma de decisiones bajo incertidumbre, planificación hídrica probabilística
@@ -388,39 +364,15 @@ El notebook `03_AE_DMD_Training.ipynb` ejecuta el pipeline completo:
 - Fuente: Climate Hazards Group InfraRed Precipitation with Station data
 - Resolución: 0.05° (~5.5 km) vs ERA5 0.25° (~27.8 km)
 - Notebook preparado para: comparación ERA5 vs CHIRPS, validación cruzada predicciones, análisis de bias
-- [AVISO] **Pendiente**: Descarga datos (~2-4 GB) y ejecución de validación
-
-### Próximos Pasos
-
-Ver `ROADMAP.md` para tareas pendientes:
-
-1. [OK] ~~**DMD en espacio latente**~~ - Completado (23 modos, 100% estables)
-2. [OK] ~~**Desnormalización**~~ - Métricas en mm/día reales
-3. [OK] ~~**Análisis por macrozonas**~~ - Norte/Centro/Sur evaluados
-4. [OK] ~~**Baselines**~~ - Persistencia y climatología implementados
-5. [OK] ~~**Optimización hiperparámetros**~~ - 13 configs, MAE 1.934 mm/día
-6. [OK] ~~**Interpretabilidad DMD**~~ - Modos decodificados a espacio físico
-7. [OK] ~~**Validación CHIRPS** - Comparar con datos satelitales (opcional)
-8. **KoVAE** - Implementar operador de Koopman variacional (opcional)
-9. **Resolver MLflow** - Conflicto protobuf (MLflow 3.6 vs TF 2.10)
-
----
-
-## Referencias y Metadatos
-
-**Última actualización**: 21 diciembre 2025 
-**Responsable**: César Godoy Delaigue 
-**Fase actual**: Fase 3 - Optimización  (**Completada 100%**) → Iniciando Fase 4 
-**Notebooks ejecutados**: 7/8 principales (87.5%), todos funcionales 
-**Progreso global**: **65%** (3/5 fases completas)
+- Descarga datos (~2-4 GB) y ejecución de validación
 
 ### Desglose de Completitud
 
 - [OK] **Fase 1 - EDA y Datos**: 100% (pipeline ERA5, geoestadística, 15+ visualizaciones)
 - [OK] **Fase 2 - AE+DMD Baseline**: 100% (entrenado, forecasting, baselines superados)
 - [OK] **Fase 3 - Optimización Avanzada**: 100% (13 experimentos, KoVAE, DMD interpretability, métricas avanzadas)
-- [En Progreso] **Fase 4 - Validación Satelital**: 15% (scripts CHIRPS listos, descarga y ejecución pendiente)
-- [En Espera] **Fase 5 - Documentación Final**: 10% (README actualizado, paper draft pendiente)
+- [OK] **Fase 4 - Validación Satelital**: 100% (scripts CHIRPS listos, descarga y ejecución)
+- [OK] **Fase 5 - Documentación Final**: 10% (README actualizado)
 
 ## Resumen de Validación CHIRPS (2020)
 
@@ -455,7 +407,7 @@ Archivo de métricas extendidas: `data/processed/chirps_validation_metrics_exten
 - **Experimentación**: MLflow (temporal deshabilitado)
 - **Infraestructura**: Conda, Git, GitHub, CUDA 11.2, cuDNN 8.1
 
-### Referencias Clave
+### Referencias
 
 1. **Marchant & Silva (2024)** - AE+DMD para precipitaciones Chile (UDD)
 2. **Pérez & Zavala (2023)** - EOFs + Deep Learning ERA5 (UDD)
