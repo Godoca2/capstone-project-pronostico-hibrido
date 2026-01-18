@@ -346,9 +346,27 @@ La predicción de variables climáticas ha evolucionado desde métodos estadíst
 
 ---
 
-### 6.3 Validación Unificada CHIRPS (Notebook 08)
+### 6.3 Benchmark Comparison (Notebook 09)
 
-**Juez Independiente:** CHIRPS Satelital (0.05°, resolución 5× mejor que ERA5)
+**Comparacion de cuatro modelos de pronostico a 1 dia (h=1):**
+
+| Modelo | MAE (mm/dia) | RMSE (mm/dia) | POD >1mm | Observacion |
+|--------|--------------|---------------|----------|-------------|
+| **ERA5 (Persistence)** | 1.86 | 4.12 | 0.678 | Baseline fisico |
+| **ConvLSTM** | 1.45 | 3.89 | 0.312 | Mode collapse |
+| **AE+DMD** | **1.72** | 3.95 | 0.746 | Mejor balance MAE-POD |
+| **KoVAE** | 2.41 | 4.87 | **0.815** | Mejor deteccion |
+
+**Hallazgos clave:**
+- ConvLSTM sufre "mode collapse" en datos de precipitacion (~85% ceros)
+- Las arquitecturas encoder-decoder superan a ConvLSTM end-to-end
+- Trade-off deteccion vs precision: KoVAE detecta mas eventos pero con mayor MAE
+
+---
+
+### 6.4 Validacion Unificada CHIRPS (Notebook 08)
+
+**Juez Independiente:** CHIRPS Satelital (0.05°, resolucion 5x mejor que ERA5)
 
 **Comparación AE+DMD vs KoVAE vs ERA5:**
 
@@ -370,7 +388,7 @@ La predicción de variables climáticas ha evolucionado desde métodos estadíst
 
 ---
 
-### 6.4 Análisis DMD (Notebook 07)
+### 6.5 Analisis DMD (Notebook 07)
 
 **Modos estables identificados:**
 - Total: **23 modos** (100% estables)
@@ -409,7 +427,8 @@ CAPSTONE_PROJECT/
 │   ├── 05_KoVAE_Test.ipynb
 │   ├── 06_Hyperparameter_Experiments.ipynb
 │   ├── 07_DMD_Interpretability.ipynb
-│   └── 08_CHIRPS_Validation.ipynb
+│   ├── 08_CHIRPS_Validation.ipynb
+│   └── 09_Benchmark_Comparison.ipynb
 │
 ├── src/                        # Código fuente
 │   ├── models/
@@ -483,7 +502,8 @@ jupyter notebook notebooks/
 5. `05_KoVAE_Test.ipynb` - Modelo probabilístico
 6. `06_Hyperparameter_Experiments.ipynb` - Optimización
 7. `07_DMD_Interpretability.ipynb` - Interpretabilidad
-8. `08_CHIRPS_Validation.ipynb` - Validación satelital
+8. `08_CHIRPS_Validation.ipynb` - Validacion satelital
+9. `09_Benchmark_Comparison.ipynb` - Comparacion de modelos (ConvLSTM, AE+DMD, KoVAE)
 
 ---
 
@@ -511,7 +531,7 @@ jupyter notebook notebooks/
 
 ---
 
-**Última actualización:** 3 de Enero de 2026
+**Ultima actualizacion:** 16 de Enero de 2026
 
 *Universidad del Desarrollo - Magíster en Data Science*
 

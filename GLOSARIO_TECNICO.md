@@ -1,9 +1,9 @@
 # GLOSARIO TÉCNICO Y CIENTÍFICO
 ## Proyecto: Pronóstico Híbrido Espacio-Temporal de Precipitaciones en Chile
 
-**Versión:** 1.0  
-**Fecha:** 23 de Noviembre de 2025  
-**Autor:** César Godoy Delaigue
+**Version:** 1.1  
+**Fecha:** 16 de Enero de 2026  
+**Autor:** Cesar Godoy Delaigue
 
 ---
 
@@ -74,12 +74,24 @@ Dataset satelital de precipitación a 0.05° de resolución, usado para validaci
 
 **Cobertura:** Global, 1981-presente, actualización cuasi-tiempo real.
 
-### Climatología
-Promedio de largo plazo (típicamente 30 años) de una variable climática para cada día/mes del año.
+### Climatologia
+Promedio de largo plazo (tipicamente 30 anos) de una variable climatica para cada dia/mes del ano.
 
-**Uso como baseline:** Pronóstico = precipitación promedio para esa fecha del año.
+**Uso como baseline:** Pronostico = precipitacion promedio para esa fecha del ano.
 
-### Convolución (Convolutional Layer)
+### CSI (Critical Success Index)
+Indice de exito critico, tambien conocido como Threat Score. Mide el rendimiento global en deteccion de eventos considerando hits, misses y false alarms.
+
+**Formula:**
+```
+CSI = Hits / (Hits + Misses + False Alarms)
+```
+
+**Interpretacion:** CSI = 1 significa prediccion perfecta; CSI = 0 significa fallo total.
+
+**Ventaja:** Balance entre POD y FAR en una sola metrica.
+
+### Convolucion (Convolutional Layer)
 Operación que aplica filtros (kernels) a una ventana espacial de datos para extraer características locales.
 
 **Ejemplo:**
@@ -88,9 +100,21 @@ Conv2D(filters=64, kernel_size=3, padding='same')
 ```
 
 ### Conv2DTranspose
-Operación de convolución "inversa" usada para upsampling en decoders. Proyecta de baja a alta resolución espacial.
+Operacion de convolucion "inversa" usada para upsampling en decoders. Proyecta de baja a alta resolucion espacial.
 
-**Ventaja sobre UpSampling2D:** Implementación determinista compatible con GPUs.
+**Ventaja sobre UpSampling2D:** Implementacion determinista compatible con GPUs.
+
+### ConvLSTM (Convolutional LSTM)
+Arquitectura de red neuronal que combina operaciones convolucionales con celdas LSTM para capturar dependencias espacio-temporales simultaneamente.
+
+**Arquitectura tipica:**
+```
+Input (T, H, W, C) -> ConvLSTM2D -> BatchNorm -> Conv3D -> Output
+```
+
+**Limitacion observada:** Sufre mode collapse en datos de precipitacion con distribucion sesgada (~85% ceros).
+
+**Notebook 09:** Usado como benchmark de Deep Learning end-to-end.
 
 ### Covarianza Espacial
 Medida de co-variación entre valores de un campo en dos ubicaciones separadas por una distancia h.
@@ -205,15 +229,27 @@ Salida de una capa convolucional que representa características aprendidas de l
 
 **Ejemplo:** Primera capa extrae 32 feature maps de bordes/texturas.
 
-### Forecast Horizon (Horizonte de Pronóstico)
-Tiempo futuro para el cual se realiza una predicción.
+### Forecast Horizon (Horizonte de Pronostico)
+Tiempo futuro para el cual se realiza una prediccion.
 
-**Horizontes evaluados:** 1, 3 y 7 días adelante.
+**Horizontes evaluados:** 1, 3 y 7 dias adelante.
 
 ### Forecasting
-Proceso de predecir valores futuros de una variable basándose en observaciones pasadas.
+Proceso de predecir valores futuros de una variable basandose en observaciones pasadas.
 
-### Función de Covarianza
+### FAR (False Alarm Rate)
+Tasa de falsas alarmas en prediccion categorica. Mide la proporcion de predicciones positivas que fueron incorrectas.
+
+**Formula:**
+```
+FAR = False Alarms / (Hits + False Alarms)
+```
+
+**Interpretacion:** FAR = 0 significa ninguna falsa alarma; FAR = 1 significa todas las predicciones positivas fueron incorrectas.
+
+**Uso en proyecto:** Evaluacion de deteccion de eventos de precipitacion >1mm y >10mm.
+
+### Funcion de Covarianza
 Función que describe la covarianza entre dos puntos separados por un vector h.
 
 **Relación con variograma:**
@@ -397,16 +433,25 @@ MAE = (1/n) * Σ|yᵢ - ŷᵢ|
 **Ventaja:** Interpretable en unidades originales (mm/día).
 
 ### MaxPooling
-Operación de downsampling que toma el valor máximo en una ventana espacial.
+Operacion de downsampling que toma el valor maximo en una ventana espacial.
 
-**Configuración:** MaxPooling2D(2,2) reduce dimensiones a la mitad.
+**Configuracion:** MaxPooling2D(2,2) reduce dimensiones a la mitad.
 
-### Media Móvil (Moving Average)
+### Media Movil (Moving Average)
 Promedio de ventana deslizante usado para suavizar series temporales y resaltar tendencias.
 
-**Ventana usada:** 7 días para visualizar patrones semanales.
+**Ventana usada:** 7 dias para visualizar patrones semanales.
 
-### Modelo Esférico (Spherical Model)
+### Mode Collapse
+Fenomeno en modelos generativos y de regresion donde el modelo converge a predecir un unico valor (tipicamente la media o cero) ignorando la variabilidad de los datos.
+
+**Causa en precipitacion:** Distribucion sesgada con ~85% de valores cero hace que predecir cero minimize la loss.
+
+**Modelos afectados:** ConvLSTM en prediccion de precipitacion.
+
+**Solucion:** Arquitecturas encoder-decoder (AE+DMD, KoVAE) que trabajan en espacio latente.
+
+### Modelo Esferico (Spherical Model)
 Modelo de variograma con crecimiento lineal inicial y plateau en el range.
 
 **Ecuación:**
@@ -503,14 +548,28 @@ Valor bajo el cual cae un porcentaje dado de observaciones.
 - Sur: 8.82 mm/día
 
 ### Persistence (Modelo)
-Baseline que asume el futuro será igual al último valor observado.
+Baseline que asume el futuro sera igual al ultimo valor observado.
 
-**Ecuación:**
+**Ecuacion:**
 ```
-ŷ(t+h) = y(t)  ∀h > 0
+y_hat(t+h) = y(t)  para todo h > 0
 ```
 
-### Pooling → Ver **MaxPooling**
+**Uso en proyecto:** Baseline fisico en Notebook 09 para comparacion de modelos.
+
+### POD (Probability of Detection)
+Probabilidad de deteccion en prediccion categorica. Mide la proporcion de eventos reales que fueron correctamente predichos.
+
+**Formula:**
+```
+POD = Hits / (Hits + Misses)
+```
+
+**Interpretacion:** POD = 1 significa deteccion perfecta; POD = 0 significa ningun evento detectado.
+
+**Uso en proyecto:** Evaluacion de deteccion de eventos de precipitacion >1mm y >10mm.
+
+### Pooling -> Ver **MaxPooling**
 
 ### Precipitación Total (Total Precipitation)
 Suma de precipitación convectiva y estratiforme, variable clave del proyecto.
